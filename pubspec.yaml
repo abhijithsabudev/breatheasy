@@ -40,9 +40,8 @@ dependencies:
   riverpod: ^2.4.0
   hooks_riverpod: ^2.4.0
 
-  # Firebase
-  firebase_core: ^2.24.0
-  cloud_firestore: ^4.13.0
+  # Navigation
+  go_router: ^13.0.0
 
 dev_dependencies:
   flutter_test:
