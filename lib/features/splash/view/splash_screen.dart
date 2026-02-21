@@ -13,16 +13,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToHome();
+    _startSplashTimer();
   }
 
-  void _navigateToHome() async {
-    // Simulate splash screen delay
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      context.go('/home');
-    }
+  void _startSplashTimer() {
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        context.go('/home');
+      }
+    });
   }
 
   @override
