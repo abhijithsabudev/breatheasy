@@ -14,8 +14,8 @@ class StartBreathingButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
-      width: double.infinity,
       child: CustomButton(
+        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 12),
         text: 'Start breathing',
         onPressed: () {
           ref

@@ -34,41 +34,46 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final decoratedButton = Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        color: gradient == null
-            ? (backgroundColor ?? const Color(0xFF9C77D9))
-            : null,
-        borderRadius: BorderRadius.circular(borderRadius),
-        border:
-            border ??
-            Border.all(color: borderColor ?? Colors.transparent, width: 1),
-        boxShadow: shadow != null ? [shadow!] : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Center(
-            child: Padding(
-              padding: padding,
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style:
-                    textStyle ??
-                    TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: foregroundColor ?? Colors.white,
-                    ),
+    final decoratedButton = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            gradient: gradient,
+            color: gradient == null
+                ? (backgroundColor ?? const Color(0xFF9C77D9))
+                : null,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border:
+                border ??
+                Border.all(color: borderColor ?? Colors.transparent, width: 1),
+            boxShadow: shadow != null ? [shadow!] : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPressed,
+              borderRadius: BorderRadius.circular(borderRadius),
+              child: Center(
+                child: Padding(
+                  padding: padding,
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style:
+                        textStyle ??
+                        TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: foregroundColor ?? Colors.white,
+                        ),
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
 
     // If width or height are specified, wrap in SizedBox; otherwise wrap content
