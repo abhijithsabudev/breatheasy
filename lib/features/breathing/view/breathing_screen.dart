@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:breatheasy/features/breathing/view_model/breathing_view_model.dart';
+import 'package:breatheasy/core/view_models/theme_view_model.dart';
 
 class BreathingScreen extends ConsumerStatefulWidget {
   const BreathingScreen({super.key});
@@ -44,6 +45,8 @@ class _BreathingScreenState extends ConsumerState<BreathingScreen> {
       });
     }
 
+    final themeState = ref.watch(themeViewModelProvider);
+
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -71,6 +74,16 @@ class _BreathingScreenState extends ConsumerState<BreathingScreen> {
               context.pop();
             },
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                themeState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              ),
+              onPressed: () {
+                ref.read(themeViewModelProvider.notifier).toggleTheme();
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -108,19 +121,17 @@ class _BreathingScreenState extends ConsumerState<BreathingScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  _ProgressBar(
-                    current: breathingState.breathCount,
-                    total: breathingState.totalRounds,
-                  ),
+                  _ProgressBar(progress: breathingState.progress),
                   const SizedBox(height: 24),
                   Text(
-                    'Cycle ${breathingState.breathCount} of ${breathingState.totalRounds}',
+                    'Cycle ${breathingState.breathCount + 1} of ${breathingState.totalRounds}',
                     style: context.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 24),
                   _ControlButtons(
                     isBreathing: breathingState.isBreathing,
                     isPaused: breathingState.isPaused,
+                    currentPhase: breathingState.currentPhase,
                   ),
                 ],
               ),
@@ -143,16 +154,48 @@ class _BreathingCircle extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    double scale = 1.0;
-    if (currentPhase.contains('Breathe in')) {
-      scale = 1.2;
-    } else if (currentPhase.contains('Breathe out')) {
-      scale = 0.8;
-    }
+    return _PulsatingCircle(timeRemaining: timeRemaining);
+  }
+}
 
-    return AnimatedScale(
-      scale: scale,
-      duration: const Duration(milliseconds: 500),
+class _PulsatingCircle extends StatefulWidget {
+  final int timeRemaining;
+
+  const _PulsatingCircle({required this.timeRemaining});
+
+  @override
+  State<_PulsatingCircle> createState() => _PulsatingCircleState();
+}
+
+class _PulsatingCircleState extends State<_PulsatingCircle>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
       child: Container(
         width: 200,
         height: 200,
@@ -163,7 +206,7 @@ class _BreathingCircle extends ConsumerWidget {
         ),
         child: Center(
           child: Text(
-            timeRemaining.toString(),
+            widget.timeRemaining.toString(),
             style: context.textTheme.displayLarge?.copyWith(
               fontSize: 60,
               fontWeight: FontWeight.bold,
@@ -176,20 +219,47 @@ class _BreathingCircle extends ConsumerWidget {
 }
 
 class _ProgressBar extends StatelessWidget {
-  final int current;
-  final int total;
+  final double progress;
 
-  const _ProgressBar({required this.current, required this.total});
+  const _ProgressBar({required this.progress});
 
   @override
   Widget build(BuildContext context) {
+    final clampedProgress = progress.clamp(0.0, 1.0);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: LinearProgressIndicator(
-        value: current / total,
-        minHeight: 6,
-        backgroundColor: context.theme.cardColor,
-        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFF6B6B)),
+      child: Stack(
+        children: [
+          // Background
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              color: context.theme.cardColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          // Gradient progress
+          Container(
+            height: 6,
+            width: double.infinity,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: clampedProgress,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0xFFFF8A00), Color(0xFF6C0862)],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -198,29 +268,67 @@ class _ProgressBar extends StatelessWidget {
 class _ControlButtons extends ConsumerWidget {
   final bool isBreathing;
   final bool isPaused;
+  final String currentPhase;
 
-  const _ControlButtons({required this.isBreathing, required this.isPaused});
+  const _ControlButtons({
+    required this.isBreathing,
+    required this.isPaused,
+    required this.currentPhase,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton(
-        onPressed: () {
-          if (isPaused) {
-            ref.read(breathingViewModelProvider.notifier).resumeBreathing();
-          } else {
-            ref.read(breathingViewModelProvider.notifier).pauseBreathing();
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Text(
-            isPaused ? 'Resume' : 'Pause',
-            style: const TextStyle(fontSize: 16),
+    // Don't show pause/resume button during prep timer
+    if (currentPhase == 'Get ready') {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Pause button
+        if (!isPaused)
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () {
+                ref.read(breathingViewModelProvider.notifier).pauseBreathing();
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.pause, size: 20),
+                    SizedBox(width: 8),
+                    Text('Pause', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        // Resume button
+        if (isPaused)
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () {
+                ref.read(breathingViewModelProvider.notifier).resumeBreathing();
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.play_arrow, size: 20),
+                    SizedBox(width: 8),
+                    Text('Resume', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -3,13 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:breatheasy/features/home/view_model/home_view_model.dart';
 import 'package:breatheasy/features/breathing/view_model/breathing_view_model.dart';
+import 'package:breatheasy/core/view_models/theme_view_model.dart';
 
 class SuccessScreen extends ConsumerWidget {
   const SuccessScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeViewModelProvider);
+
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(
+              themeState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            ),
+            onPressed: () {
+              ref.read(themeViewModelProvider.notifier).toggleTheme();
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Column(

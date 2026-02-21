@@ -17,6 +17,10 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
   bool _isFirstStart = true;
   int _lastDisplayedTime = -1;
 
+  // For overall progress tracking
+  int _totalExerciseDurationMilliseconds = 0;
+  int _overallElapsedMilliseconds = 0;
+
   void initBreathing({
     required int breatheIn,
     required int holdIn,
@@ -30,6 +34,11 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     _holdOutDuration = holdOut;
     _elapsedMilliseconds = 0;
     _phaseDurationSeconds = 0;
+    _overallElapsedMilliseconds = 0;
+
+    // Calculate total duration: sum of all phases × total rounds
+    final phaseSum = breatheIn + holdIn + breatheOut + holdOut;
+    _totalExerciseDurationMilliseconds = phaseSum * totalRounds * 1000;
 
     state = state.copyWith(
       isBreathing: false,
@@ -40,6 +49,7 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
       isCompleted: false,
       currentPhase: 'Get ready',
       currentPhaseTime: 0,
+      progress: 0.0,
     );
   }
 
@@ -62,12 +72,17 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     _elapsedMilliseconds = 0;
     _phaseDurationSeconds = 0;
     _lastDisplayedTime = -1;
+    _overallElapsedMilliseconds = 0;
 
     // Set parameters
     _breatheInDuration = breatheIn;
     _holdInDuration = holdIn;
     _breatheOutDuration = breatheOut;
     _holdOutDuration = holdOut;
+
+    // Calculate total duration
+    final phaseSum = breatheIn + holdIn + breatheOut + holdOut;
+    _totalExerciseDurationMilliseconds = phaseSum * totalRounds * 1000;
 
     // Reset state
     state = state.copyWith(
@@ -79,31 +94,7 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
       isCompleted: false,
       currentPhase: 'Get ready',
       currentPhaseTime: 0,
-    );
-  }
-
-  void resetExercise() {
-    if (!_isActive) return;
-
-    // Cancel any running timers
-    _updateTimer?.cancel();
-    _updateTimer = null;
-
-    // Reset all tracking variables
-    _elapsedMilliseconds = 0;
-    _phaseDurationSeconds = 0;
-    _lastDisplayedTime = -1;
-    _isFirstStart = true;
-
-    // Reset to fresh state
-    state = state.copyWith(
-      isBreathing: false,
-      isPaused: false,
-      breathCount: 0,
-      status: "You're natural!",
-      isCompleted: false,
-      currentPhase: 'Get ready',
-      currentPhaseTime: 0,
+      progress: 0.0,
     );
   }
 
@@ -142,10 +133,12 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     _elapsedMilliseconds = 0;
     _lastDisplayedTime = -1;
     _isFirstStart = true;
+    _overallElapsedMilliseconds = 0;
     state = state.copyWith(
       isBreathing: false,
       isPaused: false,
       status: 'Exercise stopped',
+      progress: 0.0,
     );
   }
 
@@ -156,11 +149,13 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     _elapsedMilliseconds = 0;
     _lastDisplayedTime = -1;
     _isFirstStart = true;
+    _overallElapsedMilliseconds = 0;
     state = state.copyWith(
       isBreathing: false,
       isPaused: false,
       isCompleted: true,
       status: "You did it! Great work!",
+      progress: 1.0,
     );
   }
 
@@ -179,9 +174,9 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
 
       // Hold in
       if (!await _animatePhase(
-        'Hold gently',
+        'Hold softly',
         _holdInDuration,
-        "you're doing great",
+        'just be there',
       )) {
         break;
       }
@@ -199,7 +194,7 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
       if (!await _animatePhase(
         'Hold gently',
         _holdOutDuration,
-        "you're doing great",
+        'you are doing great',
       )) {
         break;
       }
@@ -265,9 +260,13 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
       // Only increment elapsed time if not paused
       if (!state.isPaused) {
         _elapsedMilliseconds += 100;
+        _overallElapsedMilliseconds += 100;
       }
 
       _updatePhaseDisplay();
+
+      // Update progress
+      _updateProgress();
 
       // Check if phase is complete (with small buffer for timing accuracy)
       if (_elapsedMilliseconds >= _phaseDurationSeconds * 1000) {
@@ -288,13 +287,13 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
 
     state = state.copyWith(
       currentPhase: 'Get ready',
-      status: 'Exercise starts in...',
-      currentPhaseTime: 5,
+      status: 'Get going on your breathing session',
+      currentPhaseTime: 3,
     );
 
     final Completer<void> prepCompleter = Completer<void>();
-    int prepSeconds = 5;
-    _lastDisplayedTime = 5; // Track the displayed prep time
+    int prepSeconds = 3;
+    _lastDisplayedTime = 3; // Track the displayed prep time
 
     // Cancel any existing timer
     _updateTimer?.cancel();
@@ -357,6 +356,19 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     }
   }
 
+  void _updateProgress() {
+    if (!_isActive || _totalExerciseDurationMilliseconds <= 0) return;
+
+    // Calculate progress as a percentage (0.0 to 1.0)
+    final progress =
+        (_overallElapsedMilliseconds / _totalExerciseDurationMilliseconds)
+            .clamp(0.0, 1.0);
+
+    if (_isActive && state.isBreathing) {
+      state = state.copyWith(progress: progress);
+    }
+  }
+
   @override
   void dispose() {
     // Set flag first to prevent any state updates
@@ -370,6 +382,8 @@ class BreathingViewModel extends StateNotifier<BreathingState> {
     _elapsedMilliseconds = 0;
     _phaseDurationSeconds = 0;
     _lastDisplayedTime = -1;
+    _overallElapsedMilliseconds = 0;
+    _totalExerciseDurationMilliseconds = 0;
 
     super.dispose();
   }

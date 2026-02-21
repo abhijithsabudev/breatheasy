@@ -8,6 +8,7 @@ class BreathingState {
   final bool isCompleted;
   final int currentPhaseTime;
   final String currentPhase;
+  final double progress;
 
   const BreathingState({
     this.isBreathing = false,
@@ -19,6 +20,7 @@ class BreathingState {
     this.isCompleted = false,
     this.currentPhaseTime = 0,
     this.currentPhase = 'Get ready',
+    this.progress = 0.0,
   });
 
   BreathingState copyWith({
@@ -31,6 +33,7 @@ class BreathingState {
     bool? isCompleted,
     int? currentPhaseTime,
     String? currentPhase,
+    double? progress,
   }) {
     return BreathingState(
       isBreathing: isBreathing ?? this.isBreathing,
@@ -42,6 +45,7 @@ class BreathingState {
       isCompleted: isCompleted ?? this.isCompleted,
       currentPhaseTime: currentPhaseTime ?? this.currentPhaseTime,
       currentPhase: currentPhase ?? this.currentPhase,
+      progress: progress ?? this.progress,
     );
   }
 }
