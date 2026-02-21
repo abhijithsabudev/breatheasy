@@ -1,3 +1,4 @@
+import 'package:breatheasy/config/theme_config/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SoundSettingsSection extends StatelessWidget {
@@ -29,8 +30,10 @@ class SoundSettingsSection extends StatelessWidget {
         Switch(
           value: soundEnabled,
           onChanged: onChanged,
-          activeThumbColor: const Color(0xFF9C77D9),
-          activeTrackColor: const Color(0xFF9C77D9).withValues(alpha: 0.3),
+          activeThumbColor: context.colors.white,
+          activeTrackColor: const Color(0xFF823386),
+          trackOutlineWidth: WidgetStateProperty.all(0.0),
+          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
         ),
       ],
     );

@@ -1,6 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:breatheasy/config/theme_config/app_colors.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -26,34 +27,35 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [context.colors.topgradient, context.colors.bottomgradient],
         ),
-        child: const Center(
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CupertinoActivityIndicator(radius: 20),
-              SizedBox(height: 24),
               Text(
-                'BreatheEasy',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.white,
-                ),
+                'BreathEasy',
+                style:
+                    Theme.of(context).textTheme.displayLarge?.copyWith(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ) ??
+                    const TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
               ),
-              SizedBox(height: 8),
-              Text(
-                'Loading...',
-                style: TextStyle(fontSize: 16, color: CupertinoColors.white),
-              ),
+              const SizedBox(height: 60),
             ],
           ),
         ),

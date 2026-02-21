@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:breatheasy/config/theme_config/app_colors.dart';
+import 'package:breatheasy/custom_components/buttons/advanced_custom_button.dart';
 import 'package:breatheasy/features/breathing/view_model/breathing_view_model.dart';
-import 'package:breatheasy/core/view_models/theme_view_model.dart';
+import 'package:breatheasy/config/theme_config/viewmodel/theme_view_model.dart';
 
 class BreathingScreen extends ConsumerStatefulWidget {
   const BreathingScreen({super.key});
@@ -47,96 +49,106 @@ class _BreathingScreenState extends ConsumerState<BreathingScreen> {
 
     final themeState = ref.watch(themeViewModelProvider);
 
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop && mounted) {
-          // Stop breathing before navigating away
-          try {
-            ref.read(breathingViewModelProvider.notifier).stopBreathing();
-          } catch (_) {
-            // Widget might be disposed, silently handle
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [context.colors.topgradient, context.colors.bottomgradient],
+        ),
+      ),
+      child: PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop && mounted) {
+            // Stop breathing before navigating away
+            try {
+              ref.read(breathingViewModelProvider.notifier).stopBreathing();
+            } catch (_) {
+              // Widget might be disposed, silently handle
+            }
           }
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () {
-              // Stop breathing before navigating away
-              try {
-                ref.read(breathingViewModelProvider.notifier).stopBreathing();
-              } catch (_) {
-                // Widget might be disposed, silently handle
-              }
-              context.pop();
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                themeState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              ),
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
               onPressed: () {
-                ref.read(themeViewModelProvider.notifier).toggleTheme();
+                // Stop breathing before navigating away
+                try {
+                  ref.read(breathingViewModelProvider.notifier).stopBreathing();
+                } catch (_) {
+                  // Widget might be disposed, silently handle
+                }
+                context.pop();
               },
             ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "You're natural!",
-                      style: context.textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 48),
-                    _BreathingCircle(
-                      currentPhase: breathingState.currentPhase,
-                      timeRemaining: breathingState.currentPhaseTime,
-                    ),
-                    const SizedBox(height: 48),
-                    Text(
-                      breathingState.currentPhase,
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontSize: 24,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  themeState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                ),
+                onPressed: () {
+                  ref.read(themeViewModelProvider.notifier).toggleTheme();
+                },
+              ),
+            ],
+          ),
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "You're natural!",
+                        style: context.textTheme.bodyMedium,
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 48),
+                      _BreathingCircle(
+                        currentPhase: breathingState.currentPhase,
+                        timeRemaining: breathingState.currentPhaseTime,
+                      ),
+                      const SizedBox(height: 48),
+                      Text(
+                        breathingState.currentPhase,
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        breathingState.status,
+                        style: context.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    _ProgressBar(progress: breathingState.progress),
+                    const SizedBox(height: 24),
                     Text(
-                      breathingState.status,
+                      'Cycle ${breathingState.breathCount + 1} of ${breathingState.totalRounds}',
                       style: context.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 24),
+                    _ControlButtons(
+                      isPaused: breathingState.isPaused,
+                      currentPhase: breathingState.currentPhase,
                     ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  _ProgressBar(progress: breathingState.progress),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Cycle ${breathingState.breathCount + 1} of ${breathingState.totalRounds}',
-                    style: context.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 24),
-                  _ControlButtons(
-                    isBreathing: breathingState.isBreathing,
-                    isPaused: breathingState.isPaused,
-                    currentPhase: breathingState.currentPhase,
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -201,8 +213,8 @@ class _PulsatingCircleState extends State<_PulsatingCircle>
         height: 200,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFF9C77D9).withValues(alpha: 0.3),
-          border: Border.all(color: const Color(0xFF9C77D9), width: 2),
+          color: context.colors.purple1,
+          border: Border.all(color: context.colors.purple2, width: 1),
         ),
         child: Center(
           child: Text(
@@ -266,69 +278,37 @@ class _ProgressBar extends StatelessWidget {
 }
 
 class _ControlButtons extends ConsumerWidget {
-  final bool isBreathing;
   final bool isPaused;
   final String currentPhase;
 
-  const _ControlButtons({
-    required this.isBreathing,
-    required this.isPaused,
-    required this.currentPhase,
-  });
+  const _ControlButtons({required this.isPaused, required this.currentPhase});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Don't show pause/resume button during prep timer
+    // Don't show button during prep timer
     if (currentPhase == 'Get ready') {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Pause button
-        if (!isPaused)
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                ref.read(breathingViewModelProvider.notifier).pauseBreathing();
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.pause, size: 20),
-                    SizedBox(width: 8),
-                    Text('Pause', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        // Resume button
-        if (isPaused)
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                ref.read(breathingViewModelProvider.notifier).resumeBreathing();
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.play_arrow, size: 20),
-                    SizedBox(width: 8),
-                    Text('Resume', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-      ],
+    return AdvancedCustomButton(
+      text: isPaused ? 'Resume' : 'Pause',
+      icon: isPaused ? Icons.play_arrow : Icons.pause,
+      onPressed: () {
+        if (isPaused) {
+          ref.read(breathingViewModelProvider.notifier).resumeBreathing();
+        } else {
+          ref.read(breathingViewModelProvider.notifier).pauseBreathing();
+        }
+      },
+      width: 150,
+      backgroundColor: context.colors.brandSubtle,
+      foregroundColor: Colors.white,
+      iconColor: context.theme.textTheme.headlineSmall?.color,
+      height: 56,
+      borderRadius: 100,
+      iconSize: 24,
+      iconSpacing: 4,
+      textStyle: context.textTheme.headlineSmall,
     );
   }
 }

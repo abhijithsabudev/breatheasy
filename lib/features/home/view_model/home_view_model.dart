@@ -11,10 +11,6 @@ class HomeViewModel extends StateNotifier<HomeState> {
       message: 'Welcome to BreatheEasy!',
     );
   }
-
-  void startBreathingExercise() {
-    state = state.copyWith(message: 'Starting breathing exercise...');
-  }
 }
 
 class HomePreferencesViewModel extends StateNotifier<HomePreferencesState> {

@@ -1,18 +1,33 @@
+import 'package:breatheasy/config/theme_config/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class HomePageHeader extends StatelessWidget {
-  const HomePageHeader({super.key});
+  final bool isWeb;
+
+  const HomePageHeader({super.key, required this.isWeb});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Set your pace', style: context.textTheme.displayLarge),
-        const SizedBox(height: 8),
+        Text(
+          'Set your breathing pace',
+          style: context.textTheme.displayLarge?.copyWith(
+            fontSize: isWeb ? 48 : 32,
+            fontWeight: FontWeight.bold,
+            color: context.colors.brandPrimary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
         Text(
           'Customise your breathing session. You can always change this later.',
-          style: context.textTheme.bodyMedium,
+          style: context.textTheme.bodyMedium?.copyWith(
+            fontSize: isWeb ? 16 : 14,
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
     );

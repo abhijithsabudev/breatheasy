@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:breatheasy/config/theme_config/app_colors.dart';
 import 'package:breatheasy/features/home/model/home_preferences_state.dart';
 import 'package:breatheasy/features/breathing/view_model/breathing_view_model.dart';
+import 'package:breatheasy/custom_components/buttons/custom_button.dart';
 
 class StartBreathingButton extends ConsumerWidget {
   final HomePreferencesState preferences;
@@ -13,7 +15,8 @@ class StartBreathingButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
-      child: FilledButton(
+      child: CustomButton(
+        text: 'Start breathing',
         onPressed: () {
           ref
               .read(breathingViewModelProvider.notifier)
@@ -26,10 +29,10 @@ class StartBreathingButton extends ConsumerWidget {
               );
           context.goNamed('breathing');
         },
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          child: Text('Start breathing', style: TextStyle(fontSize: 16)),
-        ),
+        backgroundColor: context.colors.buttonPrimary,
+        foregroundColor: Colors.white,
+        height: 56,
+        borderRadius: 100,
       ),
     );
   }

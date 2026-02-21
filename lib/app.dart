@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:breatheasy/config/route_config/route_config.dart';
 import 'package:breatheasy/config/theme_config/theme_config.dart';
-import 'package:breatheasy/core/view_models/theme_view_model.dart';
+import 'package:breatheasy/config/theme_config/viewmodel/theme_view_model.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -16,6 +16,8 @@ class MyApp extends ConsumerWidget {
     });
 
     return MaterialApp.router(
+      debugShowMaterialGrid: false,
+      debugShowCheckedModeBanner: false,
       title: 'BreatheEasy',
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),

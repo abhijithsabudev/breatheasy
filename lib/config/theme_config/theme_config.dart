@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData lightTheme() {
@@ -6,43 +8,43 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF9C77D9),
+        seedColor: AppColorScheme.light.violet,
         brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: const Color(0xFFF5F1F8),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFF5F1F8),
+      scaffoldBackgroundColor: AppColorScheme.light.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColorScheme.light.background,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: AppColorScheme.light.black87),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: AppColorScheme.light.orange1,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFFE8E0F0), width: 1),
+          side: BorderSide(color: AppColorScheme.light.orange1, width: 1),
         ),
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.quicksand(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: AppColorScheme.light.black87,
         ),
-        headlineSmall: TextStyle(
+        headlineSmall: GoogleFonts.quicksand(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: AppColorScheme.light.black87,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: GoogleFonts.quicksand(
           fontSize: 14,
-          color: Color(0xFF888888),
+          color: AppColorScheme.light.grey,
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF9C77D9),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColorScheme.light.violet,
+          foregroundColor: AppColorScheme.light.white,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -57,43 +59,43 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF9C77D9),
+        seedColor: AppColorScheme.dark.violet,
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: const Color(0xFF1A1A2E),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1A1A2E),
+      scaffoldBackgroundColor: AppColorScheme.dark.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColorScheme.dark.background,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: AppColorScheme.dark.white),
       ),
       cardTheme: CardThemeData(
-        color: const Color(0xFF2D2D44),
+        color: AppColorScheme.dark.cloud,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: Color(0xFF3A3A52), width: 1),
         ),
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.quicksand(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: AppColorScheme.dark.white,
         ),
-        headlineSmall: TextStyle(
+        headlineSmall: GoogleFonts.quicksand(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColorScheme.dark.white,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: GoogleFonts.quicksand(
           fontSize: 14,
-          color: Color(0xFFBBBBBB),
+          color: AppColorScheme.dark.grey,
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF9C77D9),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColorScheme.dark.violet,
+          foregroundColor: AppColorScheme.dark.white,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
